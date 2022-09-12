@@ -4,3 +4,10 @@ main: tech.mekb.survivalextras.SurvivalExtras
 api-version: 1.19
 authors: [ mekb, CallMeEcho ]
 description: Extra features for survival servers
+commands:
+  rename:
+    description: Rename the item you're holding
+    usage: /rename [<text>]
+  lore:
+    description: Modify lore from the item you're holding
+    usage: /lore (add [<text>] | insert <index> [<text>] | set <index> [<text>] | remove <index> | list | clear)
