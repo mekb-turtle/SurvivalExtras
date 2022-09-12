@@ -1,0 +1,6 @@
+name: SurvivalExtras
+version: '${project.version}'
+main: tech.mekb.survivalextras.SurvivalExtras
+api-version: 1.19
+authors: [ mekb, CallMeEcho ]
+description: Extra features for survival servers
