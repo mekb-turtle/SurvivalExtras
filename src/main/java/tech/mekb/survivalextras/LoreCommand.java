@@ -17,6 +17,8 @@ import static tech.mekb.survivalextras.SurvivalExtras.getArgString;
 import static tech.mekb.survivalextras.SurvivalExtras.replaceColours;
 
 public class LoreCommand implements CommandExecutor {
+    int loreLimit = 20;
+
     @Override
     public boolean onCommand(CommandSender sender,
                              Command cmd, String label,
@@ -31,28 +33,35 @@ public class LoreCommand implements CommandExecutor {
                     return true;
                 }
             }
+            boolean isAdd = args[0].equals("add");
+            boolean isRemove = args[0].equals("remove") && args.length == 2;
+            boolean isInsert = args[0].equals("insert") && args.length >= 2;
+            boolean isSet = args[0].equals("set") && args.length >= 2;
+            boolean isList = args[0].equals("list") && args.length == 1;
+            boolean isClear = args[0].equals("clear") && args.length == 1;
             ItemMeta im = item.getItemMeta();
             if (im != null) {
-                if (args.length < 1) {
-                    sender.sendMessage("§cUsage: " + cmd.getUsage());
-                    return true;
-                }
                 List<String> lore = im.getLore();
-                if (args[0].equals("add")) {
+                if (isAdd) {
                     if (lore == null) {
                         lore = new ArrayList<>();
                     }
-                    String str = replaceColours(getArgString(args, 1));
-                    lore.add(str);
-                    sender.sendMessage("Added new lore: " + str);
-                    im.setLore(lore);
-                } else if (args[0].equals("remove") && args.length == 2) {
+                    if (lore.size() >= loreLimit) { // stop
+                        sender.sendMessage("&cMaximum of " + loreLimit + " lines of lore");
+                    } else {
+                        String str = replaceColours(getArgString(args, 1));
+                        lore.add(str);
+                        sender.sendMessage("&fAdded new lore: " + str);
+                        im.setLore(lore);
+                    }
+                } else if (isRemove) {
                     if (lore != null) {
                         try {
-                            int i = parseInt(args[1]);
+                            int i = parseInt(args[1])-1;
                             if (i >= 0 && i < lore.size()) {
-                                sender.sendMessage("Removed lore at " + i + ": " + lore.get(i));
+                                sender.sendMessage("&fRemoved lore at " + i + ": " + lore.get(i));
                                 lore.remove(i);
+                                if (lore.size() == 0) lore = null;
                                 im.setLore(lore);
                             } else {
                                 sender.sendMessage("§cInteger " + i + " out of bounds");
@@ -66,18 +75,25 @@ public class LoreCommand implements CommandExecutor {
                         sender.sendMessage("§cNo lore");
                         return true;
                     }
-                } else if ((args[0].equals("insert") || args[0].equals("set")) && args.length >= 2) {
+                } else if (isSet || isInsert) {
+                    if (isInsert && lore == null) {
+                        lore = new ArrayList<>();
+                    }
                     if (lore != null) {
                         try {
-                            int i = parseInt(args[1]);
+                            int i = parseInt(args[1])-1;
                             String str = replaceColours(getArgString(args, 2));
                             if (i >= 0 && i < lore.size()) {
-                                if (args[0].equals("set")) {
-                                    sender.sendMessage("Set lore at " + i + ": " + str);
+                                if (isSet) {
+                                    sender.sendMessage("&fSet lore at " + i + ": " + str);
                                     lore.set(i, str);
                                 } else {
-                                    sender.sendMessage("Inserted lore before " + i + ": " + str);
-                                    lore.add(i, str);
+                                    if (lore.size() >= loreLimit) { // no
+                                        sender.sendMessage("&cMaximum of " + loreLimit + " lines of lore");
+                                    } else {
+                                        sender.sendMessage("&fInserted lore before " + i + ": " + str);
+                                        lore.add(i, str);
+                                    }
                                 }
                                 im.setLore(lore);
                             } else {
@@ -92,29 +108,32 @@ public class LoreCommand implements CommandExecutor {
                         sender.sendMessage("§cNo lore");
                         return true;
                     }
-                } else if (args[0].equals("list") && args.length == 1) {
+                } else if (isList) {
                     if (lore != null) {
-                        sender.sendMessage("Lore:");
+                        sender.sendMessage("&fLore:");
                         List<String> lines = im.getLore();
                         for (int i = 0; i < lines.size(); ++i) {
-                            sender.sendMessage("§7" + i + ". §r" + lines.get(i));
+                            sender.sendMessage("§7" + (i+1) + ". §r" + lines.get(i));
                         }
                     } else {
                         sender.sendMessage("§cNo lore");
                         return true;
                     }
-                } else if (args[0].equals("clear") && args.length == 1) {
+                } else if (isClear) {
                     if (lore == null) {
                         sender.sendMessage("§cNo lore");
                         return true;
                     } else {
                         im.setLore(null);
-                        sender.sendMessage("Cleared lore");
+                        sender.sendMessage("&fCleared lore");
                     }
                 } else {
                     sender.sendMessage("§cUsage: " + cmd.getUsage());
                     return true;
                 }
+            } else {
+                sender.sendMessage("§cYou are not holding anything");
+                return true;
             }
             item.setItemMeta(im);
             return true;

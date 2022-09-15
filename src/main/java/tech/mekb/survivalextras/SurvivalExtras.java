@@ -1,34 +1,13 @@
 package tech.mekb.survivalextras;
 
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.Sign;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
-
-public final class SurvivalExtras extends JavaPlugin implements Listener {
-    FileConfiguration config;
-    List<String> motdNoPlayer = new ArrayList<>();
-    List<String> motd;
-    private final HashMap<InetAddress, String> playerIPs = new HashMap<>();
-    Random rand = new Random();
-    boolean signEdit;
+public final class SurvivalExtras extends JavaPlugin {
+    public static FileConfiguration config;
     @Override
     public void onEnable() {
-        getServer().getPluginManager().registerEvents(this, this);
+        MOTDListener  motdListener = new MOTDListener();
         config = getConfig();
         config.addDefault("motd", new String[] {
                 "§e%player% is a nerd",
@@ -36,21 +15,38 @@ public final class SurvivalExtras extends JavaPlugin implements Listener {
                 "§e§oWelcome",
                 "§e§oWelcome %player%",
                 "§6public static void §emain§r(String[] §eargs§r) { }",
+                "§6public static void §emain§r(String[] §eargs§r) { }",
+                "§6public static void §emain§r(String[] §eargs§r) { }",
+                "§6public static void §emain§r(String[] §eargs§r) { }",
+                "§6public static void §emain§r(String[] §eargs§r) { }",
                 "System.§dout§r.println(§2\"%player%\"§r)§6;",
-                "§c§lTEXTREME§r is the best text editor!"
+                "System.§dout§r.println(§2\"Hello, World! %player%\"§r)§6;",
+                "System.§dout§r.println(§2\"Hello, World!\"§r)§6;",
+                "§c§lTEXTREME§r is the best text editor!",
+				"&e&oED IS THE STANDARD EDITOR!!!",
+				"&bmekbase&r is better than any other distro",
+				"&aodus&r > &csudo&r",
+				"&eAlphys is better than ASCII",
+				"&fYou are filled with &cDETERGENT&f.",
+				"&f%player% is filled with &cDETERGENT&f."
         });
+        config.addDefault("signEdit", true);
         this.getCommand("rename").setExecutor(new RenameCommand());
         this.getCommand("lore").setExecutor(new LoreCommand());
-        config.addDefault("signEdit", true);
         config.options().copyDefaults(true);
         saveConfig();
-        motd = config.getStringList("motd");
-        signEdit = config.getBoolean("signEdit");
-        for (String j : motd) {
+		reloadConfig();
+		config = getConfig();
+        motdListener.motd = config.getStringList("motd");
+        if (config.getBoolean("signEdit")) {
+            getServer().getPluginManager().registerEvents(new SignListener(), this);
+        }
+        for (String j : motdListener.motd) {
             if (!j.contains("%player%")) {
-                motdNoPlayer.add(j);
+                motdListener.motdNoPlayer.add(j);
             }
         }
+        getServer().getPluginManager().registerEvents(motdListener, this);
     }
 
     public static String getArgString(String[] arg, int startIndex) {
@@ -66,56 +62,5 @@ public final class SurvivalExtras extends JavaPlugin implements Listener {
         return str
                 .replaceAll("(?<!&)&([klmnox0-9a-f])", "§$1")
                 .replaceAll("(?<=&)&([klmnox0-9a-f])", "$1");
-    }
-
-    @EventHandler
-    public void join(PlayerJoinEvent e) {
-        Player p = e.getPlayer();
-        InetSocketAddress addr_ = p.getAddress();
-        if (addr_ == null) return;
-        InetAddress addr = addr_.getAddress();
-        playerIPs.put(addr, p.getName());
-    }
-
-    @EventHandler
-    public void use(PlayerInteractEvent e) {
-        if (!signEdit) return;
-        Block b = e.getClickedBlock();
-        if (b == null) return;
-        Material m = b.getType();
-        if (m == Material.ACACIA_SIGN ||
-                m == Material.BIRCH_SIGN ||
-                m == Material.CRIMSON_SIGN ||
-                m == Material.DARK_OAK_SIGN ||
-                m == Material.JUNGLE_SIGN ||
-                m == Material.MANGROVE_SIGN ||
-                m == Material.OAK_SIGN ||
-                m == Material.SPRUCE_SIGN ||
-                m == Material.WARPED_SIGN ||
-                m == Material.ACACIA_WALL_SIGN ||
-                m == Material.BIRCH_WALL_SIGN ||
-                m == Material.CRIMSON_WALL_SIGN ||
-                m == Material.DARK_OAK_WALL_SIGN ||
-                m == Material.JUNGLE_WALL_SIGN ||
-                m == Material.MANGROVE_WALL_SIGN ||
-                m == Material.OAK_WALL_SIGN ||
-                m == Material.SPRUCE_WALL_SIGN ||
-                m == Material.WARPED_WALL_SIGN) {
-            e.getPlayer().openSign((Sign) b);
-        }
-    }
-
-    @EventHandler
-    public void motd(ServerListPingEvent e) {
-        InetAddress addr = e.getAddress();
-        if (playerIPs.containsKey(addr)) {
-            String u = playerIPs.get(addr);
-            if (u != null) {
-                e.setMotd(motd.get(rand.nextInt(motd.size()))
-                        .replaceAll("%player%", u));
-                return;
-            }
-        }
-        e.setMotd(motdNoPlayer.get(rand.nextInt(motdNoPlayer.size())));
     }
 }
