@@ -45,6 +45,7 @@ public class LoreCommand implements CommandExecutor {
                     String str = replaceColours(getArgString(args, 1));
                     lore.add(str);
                     sender.sendMessage("Added new lore: " + str);
+                    im.setLore(lore);
                 } else if (args[0].equals("remove") && args.length == 2) {
                     if (lore != null) {
                         try {
@@ -52,6 +53,7 @@ public class LoreCommand implements CommandExecutor {
                             if (i >= 0 && i < lore.size()) {
                                 sender.sendMessage("Removed lore at " + i + ": " + lore.get(i));
                                 lore.remove(i);
+                                im.setLore(lore);
                             } else {
                                 sender.sendMessage("§cInteger " + i + " out of bounds");
                                 return true;
@@ -77,6 +79,7 @@ public class LoreCommand implements CommandExecutor {
                                     sender.sendMessage("Inserted lore before " + i + ": " + str);
                                     lore.add(i, str);
                                 }
+                                im.setLore(lore);
                             } else {
                                 sender.sendMessage("§cInteger " + i + " out of bounds");
                                 return true;

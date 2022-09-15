@@ -34,7 +34,7 @@ public final class SurvivalExtras extends JavaPlugin implements Listener {
                 "§e%player% is a nerd",
                 "§bHello, %player%",
                 "§e§oWelcome",
-                "§e§oWelcome %player",
+                "§e§oWelcome %player%",
                 "§6public static void §emain§r(String[] §eargs§r) { }",
                 "System.§dout§r.println(§2\"%player%\"§r)§6;",
                 "§c§lTEXTREME§r is the best text editor!"
