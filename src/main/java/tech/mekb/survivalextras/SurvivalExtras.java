@@ -10,7 +10,6 @@ public final class SurvivalExtras extends JavaPlugin {
         MOTDListener  motdListener = new MOTDListener();
         config = getConfig();
         config.addDefault("motd", new String[] {
-                "§e%player% is a nerd",
                 "§bHello, %player%",
                 "§e§oWelcome",
                 "§e§oWelcome %player%",
@@ -23,12 +22,12 @@ public final class SurvivalExtras extends JavaPlugin {
                 "System.§dout§r.println(§2\"Hello, World! %player%\"§r)§6;",
                 "System.§dout§r.println(§2\"Hello, World!\"§r)§6;",
                 "§c§lTEXTREME§r is the best text editor!",
-				"&e&oED IS THE STANDARD EDITOR!!!",
-				"&bmekbase&r is better than any other distro",
-				"&aodus&r > &csudo&r",
-				"&eAlphys is better than ASCII",
-				"&fYou are filled with &cDETERGENT&f.",
-				"&f%player% is filled with &cDETERGENT&f."
+				"§e§oED IS THE STANDARD EDITOR!!!",
+				"§bmekbase§r is better than any other distro",
+				"§aodus§r > §csudo§r",
+				"§eAlphys is better than ASCII",
+				"§fYou are filled with §cDETERGENT§f.",
+				"§f%player% is filled with §cDETERGENT§f."
         });
         config.addDefault("signEdit", true);
         this.getCommand("rename").setExecutor(new RenameCommand());
@@ -61,7 +60,7 @@ public final class SurvivalExtras extends JavaPlugin {
 
     public static String replaceColours(String str) {
         return str
-                .replaceAll("(?<!&)&([klmnox0-9a-f])", "§$1")
-                .replaceAll("(?<=&)&([klmnox0-9a-f])", "$1");
+                .replaceAll("(?<!&)&([klmnorx0-9a-f])", "§$1")
+                .replaceAll("(?<=&)&([klmnorx0-9a-f])", "$1");
     }
 }

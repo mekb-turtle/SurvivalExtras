@@ -32,6 +32,10 @@ public class LoreCommand implements CommandExecutor {
                     return true;
                 }
             }
+            if (args.length < 1) {
+                sender.sendMessage("§cUsage: " + cmd.getUsage());
+                return true;
+            }
             boolean isAdd = args[0].equals("add");
             boolean isRemove = args[0].equals("remove") && args.length == 2;
             boolean isInsert = args[0].equals("insert") && args.length >= 2;
@@ -46,11 +50,11 @@ public class LoreCommand implements CommandExecutor {
                         lore = new ArrayList<>();
                     }
                     if (lore.size() >= loreLimit) { // stop
-                        sender.sendMessage("&cMaximum of " + loreLimit + " lines of lore");
+                        sender.sendMessage("§cMaximum of " + loreLimit + " lines of lore");
                     } else {
                         String str = replaceColours(getArgString(args, 1));
                         lore.add(str);
-                        sender.sendMessage("&fAdded new lore: " + str);
+                        sender.sendMessage("§fAdded new lore: " + str);
                         im.setLore(lore);
                     }
                 } else if (isRemove) {
@@ -58,7 +62,7 @@ public class LoreCommand implements CommandExecutor {
                         try {
                             int i = parseInt(args[1])-1;
                             if (i >= 0 && i < lore.size()) {
-                                sender.sendMessage("&fRemoved lore at " + i + ": " + lore.get(i));
+                                sender.sendMessage("§fRemoved lore at " + i + ": " + lore.get(i));
                                 lore.remove(i);
                                 if (lore.size() == 0) lore = null;
                                 im.setLore(lore);
@@ -84,13 +88,13 @@ public class LoreCommand implements CommandExecutor {
                             String str = replaceColours(getArgString(args, 2));
                             if (i >= 0 && i < lore.size()) {
                                 if (isSet) {
-                                    sender.sendMessage("&fSet lore at " + i + ": " + str);
+                                    sender.sendMessage("§fSet lore at " + i + ": " + str);
                                     lore.set(i, str);
                                 } else {
                                     if (lore.size() >= loreLimit) { // no
-                                        sender.sendMessage("&cMaximum of " + loreLimit + " lines of lore");
+                                        sender.sendMessage("§cMaximum of " + loreLimit + " lines of lore");
                                     } else {
-                                        sender.sendMessage("&fInserted lore before " + i + ": " + str);
+                                        sender.sendMessage("§fInserted lore before " + i + ": " + str);
                                         lore.add(i, str);
                                     }
                                 }
@@ -109,7 +113,7 @@ public class LoreCommand implements CommandExecutor {
                     }
                 } else if (isList) {
                     if (lore != null) {
-                        sender.sendMessage("&fLore:");
+                        sender.sendMessage("§fLore:");
                         List<String> lines = im.getLore();
                         for (int i = 0; i < lines.size(); ++i) {
                             sender.sendMessage("§7" + (i+1) + ". §r" + lines.get(i));
@@ -124,7 +128,7 @@ public class LoreCommand implements CommandExecutor {
                         return true;
                     } else {
                         im.setLore(null);
-                        sender.sendMessage("&fCleared lore");
+                        sender.sendMessage("§fCleared lore");
                     }
                 } else {
                     sender.sendMessage("§cUsage: " + cmd.getUsage());
