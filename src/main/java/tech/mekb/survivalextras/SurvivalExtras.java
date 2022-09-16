@@ -47,6 +47,7 @@ public final class SurvivalExtras extends JavaPlugin {
             }
         }
         getServer().getPluginManager().registerEvents(motdListener, this);
+        getServer().getPluginManager().registerEvents(new AnvilListener(), this);
     }
 
     public static String getArgString(String[] arg, int startIndex) {
