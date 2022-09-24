@@ -10,6 +10,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.logging.Level;
@@ -26,31 +27,73 @@ public class BreakListener implements Listener {
     @EventHandler
     public void breakBlock(BlockBreakEvent e) {
         Player p = e.getPlayer();
-        ItemStack item = p.getInventory().getItemInMainHand();
+        PlayerInventory inv = p.getInventory();
+        ItemStack item = inv.getItemInMainHand();
         Material itype = item.getType();
-        if (itype == Material.DIAMOND_HOE || itype == Material.GOLDEN_HOE || itype == Material.IRON_HOE || itype == Material.STONE_HOE || itype == Material.WOODEN_HOE || itype == Material.NETHERITE_HOE) {
-            Block b = e.getBlock();
-            Material btype = b.getType();
-            if (btype == Material.WHEAT || btype == Material.WHEAT_SEEDS || btype == Material.BEETROOT || btype == Material.BEETROOT_SEEDS || btype == Material.CARROT || btype == Material.CARROTS) {
-                BlockData bd = b.getBlockData();
-                if (bd instanceof Ageable) {
-                    Ageable ba = (Ageable)bd;
-                    if (ba.getAge() == ba.getMaximumAge()) {
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                if (b.getType() == Material.AIR) {
-                                    ba.setAge(0);
-                                    b.setType(btype);
-                                    b.setBlockData(ba);
+        switch (itype) {
+            case DIAMOND_HOE:
+            case GOLDEN_HOE:
+            case IRON_HOE:
+            case STONE_HOE:
+            case WOODEN_HOE:
+            case NETHERITE_HOE:
+                Block b = e.getBlock();
+                Material btype = b.getType();
+                switch (btype) {
+                    case WHEAT:
+                    case BEETROOTS:
+                    case CARROTS:
+                        BlockData bd = b.getBlockData();
+                        if (bd instanceof Ageable) {
+                            Ageable ba = (Ageable) bd;
+                            if (ba.getAge() == ba.getMaximumAge()) {
+                                Material im = null;
+                                switch (btype) {
+                                    case WHEAT:
+                                        im = Material.WHEAT_SEEDS;
+                                        break;
+                                    case BEETROOTS:
+                                        im = Material.BEETROOT_SEEDS;
+                                        break;
+                                    case CARROTS:
+                                        im = Material.CARROT;
+                                        break;
+                                    default:
+                                        return;
                                 }
+                                boolean a = false;
+                                for (int i = 0; i < 36; ++i) {
+                                    ItemStack it = inv.getItem(i);
+                                    if (it == null) continue;
+                                    if (it.getType() != im) continue;
+                                    int s = it.getAmount() - 1;
+                                    a = true;
+                                    if (s <= 0) {
+                                        inv.setItem(i, new ItemStack(Material.AIR));
+                                    } else {
+                                        it.setAmount(s);
+                                        inv.setItem(i, it);
+                                    }
+									break;
+                                }
+                                if (!a) return;
+                                new BukkitRunnable() {
+                                    @Override
+                                    public void run() {
+                                        if (b.getType() == Material.AIR) {
+                                            ba.setAge(0);
+                                            b.setType(btype);
+                                            b.setBlockData(ba);
+                                        }
+                                    }
+                                }.runTaskLater(main, 1L);
+                            } else {
+                                e.setCancelled(true);
                             }
-                        }.runTaskLater(main, 1L);
-                    } else {
-                        e.setCancelled(true);
-                    }
+                        }
+                        break;
                 }
-            }
+                break;
         }
     }
 }
