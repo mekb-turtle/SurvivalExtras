@@ -30,6 +30,8 @@ public final class SurvivalExtras extends JavaPlugin {
 				"§f%player% is filled with §cDETERGENT§f."
         });
         config.addDefault("signEdit", true);
+        config.addDefault("infiniteAnvil", true);
+        config.addDefault("autoReplant", true);
         this.getCommand("rename").setExecutor(new RenameCommand());
         this.getCommand("lore").setExecutor(new LoreCommand());
         config.options().copyDefaults(true);
@@ -46,7 +48,12 @@ public final class SurvivalExtras extends JavaPlugin {
             }
         }
         getServer().getPluginManager().registerEvents(motdListener, this);
-        getServer().getPluginManager().registerEvents(new AnvilListener(), this);
+        if (config.getBoolean("infiniteAnvil")) {
+            getServer().getPluginManager().registerEvents(new AnvilListener(), this);
+        }
+        if (config.getBoolean("autoReplant")) {
+            getServer().getPluginManager().registerEvents(new BreakListener(this), this);
+        }
     }
 
     public static String getArgString(String[] arg, int startIndex) {
